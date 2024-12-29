@@ -15,19 +15,23 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         request -> request
-                                .requestMatchers("/public")
+                                .requestMatchers("/public", "/login", "/error", "/logout-success")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
                 .oauth2Login(
-                        Customizer.withDefaults()
+                        oauth -> oauth
+                                .loginPage("/login")
+                                .defaultSuccessUrl("/success", true)
+                                .failureUrl("/error")
                 )
                 .logout(
-                        logout -> logout.logoutUrl("/logout")
-                                .logoutSuccessUrl("/login?logout") // Redirige a esta URL después de cerrar sesión
-                                .invalidateHttpSession(true) // Invalidar la sesión HTTP
-                                .clearAuthentication(true) // Limpiar la autenticación
+                        logout -> logout
+                                .logoutUrl("/logout")
+                                .logoutSuccessUrl("/logout-success")
+                                .invalidateHttpSession(true)
+                                .clearAuthentication(true)
                                 .deleteCookies("JSESSIONID")
                 )
                 .build();
